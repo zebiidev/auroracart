@@ -21,11 +21,7 @@ app.post(
   StripeWebhook
 );
 
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URI,
-  })
-);
+app.use(cors());
 app.set("query parser", (str) => qs.parse(str));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
