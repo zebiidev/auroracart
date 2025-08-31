@@ -1,10 +1,7 @@
-import express from "express";
-import Stripe from "stripe";
+import Order from "../models/OrderModel.js";
 import Checkout from "../models/CheckoutModel.js";
+import stripe from "../config/stripe.js";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // your test secret key
-
-// ✅ Create checkout session
 export const CreateCheckout = async (req, res) => {
   try {
     const {
@@ -42,7 +39,7 @@ export const CreateCheckout = async (req, res) => {
       });
     }
 
-    // Save initial checkout in DB (status = pending)
+    // ✅ Step 1: Save Checkout
     const createdCheckout = await Checkout.create({
       userId: req.user._id,
       checkoutProducts,
@@ -52,39 +49,52 @@ export const CreateCheckout = async (req, res) => {
       firstName,
       lastName,
       phoneNo,
-      shippingAddress: {
-        address: shippingAddress.address,
-        city: shippingAddress.city,
-        postalCode: shippingAddress.postalCode,
-      },
+      shippingAddress,
       paymentStatus: "pending",
     });
 
-    // ✅ Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items: checkoutProducts.map((item) => ({
-        price_data: {
-          currency: "usd", // ⚠️ use "usd" since PKR isn't supported by Stripe
-          product_data: { name: item.name },
-          unit_amount: Math.round(item.price * 100), // ✅ convert to cents & fix float issue
-        },
-        quantity: item.quantity,
-      })),
-
-      success_url: `${process.env.BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.BASE_URL}/cancel`,
-      metadata: {
-        checkoutId: createdCheckout._id.toString(), // link session with your DB entry
-      },
+    // ✅ Step 2: Create Order (linked with checkout)
+    const createdOrder = await Order.create({
+      user: req.user._id,
+      orderItems: checkoutProducts,
+      shippingAddress,
+      paymentMethod,
+      totalPrice,
+      paymentStatus: "pending",
+      status: "Processing",
     });
 
+    // ✅ Step 3: If Card payment → Stripe Session
+    let sessionUrl = null;
+    if (paymentMethod === "card") {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: "payment",
+        line_items: checkoutProducts.map((item) => ({
+          price_data: {
+            currency: "usd",
+            product_data: { name: item.name },
+            unit_amount: Math.round(item.price * 100),
+          },
+          quantity: item.quantity,
+        })),
+        success_url: `${process.env.BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.BASE_URL}/cancel`,
+        metadata: {
+          checkoutId: createdCheckout._id.toString(),
+          orderId: createdOrder._id.toString(),
+        },
+      });
+
+      sessionUrl = session.url;
+    }
+
     res.status(201).json({
-      message: "Stripe session created",
+      message: "Checkout created",
       success: true,
-      url: session.url, // frontend redirects user here
       checkout: createdCheckout,
+      order: createdOrder,
+      url: sessionUrl,
     });
   } catch (error) {
     console.error("CreateCheckout error:", error);
@@ -106,15 +116,25 @@ export const StripeWebhook = async (req, res) => {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
 
-      // Find checkout in DB using metadata
+      // Get IDs from metadata
       const checkoutId = session.metadata.checkoutId;
-      const checkout = await Checkout.findById(checkoutId);
+      const orderId = session.metadata.orderId;
 
+      // ✅ Update Checkout
+      const checkout = await Checkout.findById(checkoutId);
       if (checkout) {
         checkout.paymentStatus = "paid";
         checkout.isPaid = true;
         checkout.paidAt = Date.now();
         await checkout.save();
+      }
+
+      // ✅ Update Order
+      const order = await Order.findById(orderId);
+      if (order) {
+        order.paymentStatus = "paid";
+        order.paidAt = Date.now();
+        await order.save();
       }
     }
 
