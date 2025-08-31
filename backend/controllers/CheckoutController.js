@@ -39,7 +39,7 @@ export const CreateCheckout = async (req, res) => {
       });
     }
 
-    // ✅ Step 1: Save Checkout
+    //  Step 1: Save Checkout
     const createdCheckout = await Checkout.create({
       userId: req.user._id,
       checkoutProducts,
