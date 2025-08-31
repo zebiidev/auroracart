@@ -10,6 +10,7 @@ const NavbarDrawer = ({ toggleMobilenav, setLoader, handleLogout, loader }) => {
     { name: "All Collection", path: "/collection" },
     { name: "My Orders", path: "/my-orders" },
     { name: "View cart", path: "/cart" },
+    { name: "Checkout", path: "/checkout" },
   ];
 
   const { user } = useSelector((state) => state.auth);

@@ -26,6 +26,7 @@ export const login = createAsyncThunk(
       const res = await axios.post("/api/user/login", data);
 
       if (!res.data.success) {
+        toast.error(res.data.message);
         return rejectWithValue(res.data.message || "Login failed");
       }
 
@@ -44,6 +45,10 @@ export const register = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const res = await axios.post("/api/user/register", formData);
+      if (!res.data.success) {
+        toast.error(res.data.message);
+        return rejectWithValue(res.data.message || "Regiter failed");
+      }
       if (res.data.success) {
         toast.success(res.data.message);
         return {

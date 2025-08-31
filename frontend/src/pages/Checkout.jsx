@@ -94,7 +94,7 @@ const Checkout = () => {
       try {
         const token = JSON.parse(localStorage.getItem("token"));
         const response = await fetch(
-          "http://localhost:3000/api/checkout/create-checkout",
+          "https://auroracart-a3sq.onrender.com/api/checkout/create-checkout",
           {
             method: "POST",
             headers: {
@@ -123,7 +123,7 @@ const Checkout = () => {
         }
       } catch (error) {
         console.error("Stripe Checkout Error:", error);
-        alert("Something went wrong with payment.");
+        toast.error("Something went wrong with payment.");
       }
     }
   };

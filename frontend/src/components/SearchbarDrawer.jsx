@@ -68,15 +68,15 @@ const SearchbarDrawer = ({ toggleSearchBar }) => {
               ${
                 inputValue
                   ? "top-[-10px] text-sm text-gray-700"
-                  : "top-5 text-xl text-gray-500 peer-focus:top-[-10px] peer-focus:text-sm peer-focus:text-gray-700"
+                  : "top-3 text-xl text-gray-500 peer-focus:top-[-10px] peer-focus:text-sm peer-focus:text-gray-700"
               }`}
           >
             Enter search terms
           </label>
         </div>
 
-        <button type="submit" className="-translate-x-6 pt-5">
-          <CiSearch className="cursor-pointer md:text-[35px] text-[20px]" />
+        <button type="submit" className="-translate-x-6 mb-4 pt-5">
+          <CiSearch className="cursor-pointer md:text-[35px] text-[24px]" />
         </button>
       </form>
 
