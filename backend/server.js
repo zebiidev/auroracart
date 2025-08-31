@@ -1,0 +1,43 @@
+import express from "express";
+import dotenv from "dotenv";
+import ConnectingDb from "./config/db.js";
+import userRouter from "./routes/UserRoutes.js";
+import productRouter from "./routes/ProductRoutes.js";
+import cartRouter from "./routes/CartRoutes.js";
+import adminRouter from "./routes/AdminRoutes.js";
+import checkoutRouter from "./routes/CheckoutRoutes.js";
+import qs from "qs";
+import orderRouter from "./routes/OrderRoutes.js";
+import cors from "cors";
+import bodyParser from "body-parser";
+import { StripeWebhook } from "./controllers/CheckoutController.js";
+const app = express();
+
+dotenv.config();
+
+app.post(
+  "/api/stripe/webhook",
+  bodyParser.raw({ type: "application/json" }),
+  StripeWebhook
+);
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URI,
+  })
+);
+app.set("query parser", (str) => qs.parse(str));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/user", userRouter);
+app.use("/api/product", productRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/checkout", checkoutRouter);
+app.use("/api/order", orderRouter);
+
+ConnectingDb();
+app.listen(process.env.PORT, () => {
+  console.log(`http://localhost:${process.env.PORT}`);
+});
