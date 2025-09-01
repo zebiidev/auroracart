@@ -89,12 +89,11 @@ const Checkout = () => {
 
     if (paymentMethod === "cod") {
       dispatch(CreateCheckout({ formData: data, products, totalPrice }));
-      alert("Order placed successfully with Cash on Delivery!");
     } else if (paymentMethod === "card") {
       try {
         const token = JSON.parse(localStorage.getItem("token"));
         const response = await fetch(
-          "https://auroracart-a3sq.onrender.com/api/checkout/create-checkout",
+          `${import.meta.env.VITE_API_BASE_URL}/api/checkout/create-checkout`,
           {
             method: "POST",
             headers: {

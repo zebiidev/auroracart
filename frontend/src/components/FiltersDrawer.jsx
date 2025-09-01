@@ -10,7 +10,6 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
 
   const category = [...new Set(products.map((p) => p.category))];
   const brand = [...new Set(products.map((p) => p.brand))];
-  const sizes = [...new Set(products.flatMap((p) => p.sizes))];
   const material = [...new Set(products.map((p) => p.material))];
   const collections = [...new Set(products.map((p) => p.collections))];
   const gender = [...new Set(products.map((p) => p.gender))];
@@ -23,7 +22,6 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
       category: params.category?.split(",") || [],
       gender: params.gender || "",
       brand: params.brand?.split(",") || [],
-      sizes: params.sizes?.split(",") || [],
       colors: params.colors?.split(",") || [],
       collections: params.collections?.split(",") || [],
       material: params.material?.split(",") || [],
@@ -69,9 +67,6 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
           : [],
         brand: paramsObj.brand
           ? paramsObj.brand.split(",").filter(Boolean)
-          : [],
-        sizes: paramsObj.sizes
-          ? paramsObj.sizes.split(",").filter(Boolean)
           : [],
         colors: paramsObj.colors
           ? paramsObj.colors.split(",").filter(Boolean)
@@ -153,17 +148,6 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
           <label key={`${b}-${index}`} className="flex items-center gap-2">
             <input type="checkbox" value={b} {...register("brand")} />
             <span>{b}</span>
-          </label>
-        ))}
-      </div>
-
-      {/* Sizes */}
-      <div>
-        <h1 className="text-lg font-medium mb-2">Sizes</h1>
-        {sizes.map((s, index) => (
-          <label key={`${s}-${index}`} className="flex items-center gap-2">
-            <input type="checkbox" value={s} {...register("sizes")} />
-            <span>{s}</span>
           </label>
         ))}
       </div>

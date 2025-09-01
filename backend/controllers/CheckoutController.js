@@ -78,8 +78,8 @@ export const CreateCheckout = async (req, res) => {
           },
           quantity: item.quantity,
         })),
-        success_url: `${process.env.BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.BASE_URL}/cancel`,
+        success_url: `${process.env.FRONTEND_URI}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.FRONTEND_URI}/cancel`,
         metadata: {
           checkoutId: createdCheckout._id.toString(),
           orderId: createdOrder._id.toString(),

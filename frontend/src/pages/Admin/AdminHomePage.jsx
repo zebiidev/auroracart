@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 const AdminHomePage = () => {
   const { allusers } = useSelector((state) => state.admin);
   const { products } = useSelector((state) => state.product);
+  const { orders } = useSelector((state) => state.order);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -27,7 +28,9 @@ const AdminHomePage = () => {
         <div className="rounded-md bg-white shadow-xl">
           <div className="p-4">
             <h1 className="font-semibold text-lg">Total Orders</h1>
-            <div className="text-lg font-semibold">100</div>
+            <div className="text-lg font-semibold">
+              {orders ? orders.length : 0}
+            </div>
             <Link
               to="orders"
               className="inline-block py-2 font-medium text-blue-600 hover:underline"

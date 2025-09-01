@@ -28,6 +28,7 @@ import { useDispatch } from "react-redux";
 import { GetUserCart } from "./redux/slices/CartSlice";
 import { AuthInfo } from "./redux/slices/AuthSlice";
 import PrivateRoutes from "./components/PrivateRoutes";
+import { GetAllOrders } from "./redux/slices/OrderSlice";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -46,22 +47,31 @@ const App = () => {
     dispatch(AuthInfo());
   }, []);
 
+  useEffect(() => {
+    dispatch(GetAllOrders());
+  }, []);
   const location = useLocation();
 
   const isCheckoutPage = location.pathname.startsWith("/checkout");
   const isAdminPage = location.pathname.startsWith("/admin");
-
+  const isSuccess = location.pathname.startsWith("/success");
+  const isCancel = location.pathname.startsWith("/cancel");
+  const isLogin = location.pathname.startsWith("/login");
   return (
     <div className="flex flex-col min-h-screen">
-      {isAdminPage ? null : isCheckoutPage ? <CheckoutNavbar /> : <Navbar />}
+      {isAdminPage || isSuccess || isCancel ? null : isCheckoutPage ? (
+        <CheckoutNavbar />
+      ) : (
+        <Navbar />
+      )}
 
       <main
         className={`flex-grow ${
-          isAdminPage
+          isAdminPage || isSuccess || isCancel
             ? "pt-0"
             : isCheckoutPage
             ? "pt-0"
-            : "pt-[50px] md:pt-[50px]"
+            : "pt-[70px] md:pt-[50px]"
         }`}
       >
         <Routes>
@@ -104,7 +114,7 @@ const App = () => {
         />
       </main>
 
-      {isAdminPage || (!isCheckoutPage && <Footer />)}
+      {!isAdminPage && !isSuccess && !isCancel && !isCheckoutPage && <Footer />}
     </div>
   );
 };

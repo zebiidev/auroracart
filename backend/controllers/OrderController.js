@@ -26,7 +26,7 @@ export const OrderDetails = async (req, res) => {
     const { id } = req.params;
     const orderDetails = await Order.findById(id).populate(
       "user",
-      "name email"
+      "name email createdAt firstName"
     );
 
     if (!orderDetails) {
@@ -48,7 +48,9 @@ export const OrderDetails = async (req, res) => {
 
 export const AllOrders = async (req, res) => {
   try {
-    const allOrders = await Order.find().sort({ createdAt: -1 });
+    const allOrders = await Order.find()
+      .populate("user", "firstName")
+      .sort({ createdAt: -1 });
 
     if (!allOrders) {
       return res
@@ -57,6 +59,61 @@ export const AllOrders = async (req, res) => {
     }
 
     res.status(200).json({ message: "All orders ", success: true, allOrders });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false });
+  }
+};
+
+export const DeleteOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const del = await Order.findByIdAndDelete(id);
+
+    if (!del) {
+      return res
+        .status(400)
+        .json({ message: "Unable to delete order", success: false });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Order deleted successfully", id, success: true });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false });
+  }
+};
+
+export const UpdateOrderStatus = async (req, res) => {
+  try {
+    const { updatedStatus, id } = req.query;
+
+    const updatingStatus = await Order.findByIdAndUpdate(
+      id,
+      {
+        status: updatedStatus,
+      },
+      { new: true }
+    );
+
+    if (!updatingStatus) {
+      return res
+        .status(400)
+        .json({ message: "Internal server error", success: false });
+    }
+
+    res.status(200).json({
+      message: "Status Updated Succesfully",
+      success: true,
+      id,
+      updatedStatus,
+    });
   } catch (error) {
     console.log(error);
     return res
