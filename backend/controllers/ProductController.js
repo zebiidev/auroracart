@@ -104,40 +104,40 @@ export const GetFilteredProducts = async (req, res) => {
       maxPrice,
     } = filters;
 
-    const orFilters = [];
+    const andFilters = [];
 
     if (category) {
       const categories = Array.isArray(category) ? category : [category];
-      orFilters.push({ category: { $in: categories } });
+      andFilters.push({ category: { $in: categories } });
     }
 
     if (brand) {
       const brands = Array.isArray(brand) ? brand : [brand];
-      orFilters.push({ brand: { $in: brands } });
+      andFilters.push({ brand: { $in: brands } });
     }
 
     if (sizes) {
       const sizeArr = Array.isArray(sizes) ? sizes : [sizes];
-      orFilters.push({ sizes: { $in: sizeArr } });
+      andFilters.push({ sizes: { $in: sizeArr } });
     }
 
     if (colors) {
       const colorArr = Array.isArray(colors) ? colors : [colors];
-      orFilters.push({ colors: { $in: colorArr } });
+      andFilters.push({ colors: { $in: colorArr } });
     }
 
     if (collections) {
       const colArr = Array.isArray(collections) ? collections : [collections];
-      orFilters.push({ collections: { $in: colArr } });
+      andFilters.push({ collections: { $in: colArr } });
     }
 
     if (material) {
       const matArr = Array.isArray(material) ? material : [material];
-      orFilters.push({ material: { $in: matArr } });
+      andFilters.push({ material: { $in: matArr } });
     }
 
     if (gender) {
-      orFilters.push({ gender });
+      andFilters.push({ gender });
     }
 
     const priceFilter = {};
@@ -147,15 +147,13 @@ export const GetFilteredProducts = async (req, res) => {
     if (maxPrice && !isNaN(maxPrice)) {
       priceFilter.price = { ...priceFilter.price, $lte: Number(maxPrice) };
     }
+    if (Object.keys(priceFilter).length) {
+      andFilters.push(priceFilter);
+    }
 
     let query = {};
-
-    if (orFilters.length && Object.keys(priceFilter).length) {
-      query = { $and: [{ $or: orFilters }, priceFilter] };
-    } else if (orFilters.length) {
-      query = { $or: orFilters };
-    } else if (Object.keys(priceFilter).length) {
-      query = priceFilter;
+    if (andFilters.length) {
+      query = { $and: andFilters };
     }
 
     const products = await Product.find(query);

@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { products } from "../assets/assets";
 import { useSelector } from "react-redux";
 import FadeLoader from "react-spinners/FadeLoader";
 

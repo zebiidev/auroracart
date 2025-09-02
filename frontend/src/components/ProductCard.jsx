@@ -12,6 +12,7 @@ const ProductCard = ({ CardData, toggleSearchBar }) => {
         key={CardData.id}
         onClick={() => {
           navigate(`/product-detail/${CardData._id}`);
+          toggleSearchBar();
         }}
         className="w-full  cursor-pointer group"
       >

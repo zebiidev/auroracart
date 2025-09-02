@@ -71,7 +71,7 @@ const App = () => {
             ? "pt-0"
             : isCheckoutPage
             ? "pt-0"
-            : "pt-[70px] md:pt-[50px]"
+            : "pt-[170px] md:pt-[100px]"
         }`}
       >
         <Routes>
