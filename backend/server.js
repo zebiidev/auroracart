@@ -16,7 +16,7 @@ const app = express();
 dotenv.config();
 
 app.post(
-  "/api/stripe/webhook",
+  "/api/checkout/webhook",
   bodyParser.raw({ type: "application/json" }),
   StripeWebhook
 );

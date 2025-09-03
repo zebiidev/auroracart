@@ -73,6 +73,7 @@ const Checkout = () => {
 
   const paymentMethod = watch("payment");
   const shipping = watch("shipping");
+
   const onSubmit = async (data) => {
     let totalPrice = userCart?.products.reduce(
       (acc, item) => acc + item.price * item.quantity,
