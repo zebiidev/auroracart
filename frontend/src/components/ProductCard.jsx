@@ -28,8 +28,8 @@ const ProductCard = ({ CardData, toggleSearchBar }) => {
           {CardData.name}
         </div>
         <div>
-          <span className="line-through">{CardData.price}</span> PKR{" "}
-          {CardData.discountPrice}
+          <span className="line-through">{CardData.price}</span>
+          {import.meta.env.VITE_CURRENCY} {CardData.discountPrice}
         </div>
       </div>
     </div>

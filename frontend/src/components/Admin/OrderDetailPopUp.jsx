@@ -12,8 +12,6 @@ const OrderDetailPopUp = ({ setShowPopup, detailLoading, orderDetails }) => {
     }
   };
 
-  console.log(orderDetails);
-
   useEffect(() => {
     document.addEventListener("mousedown", hndleClickOutside);
     return () => document.removeEventListener("mousedown", hndleClickOutside);
@@ -23,7 +21,7 @@ const OrderDetailPopUp = ({ setShowPopup, detailLoading, orderDetails }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div
         ref={popRef}
-        className="relative w-[60vw] max-h-[80vh] overflow-y-auto bg-white rounded-2xl shadow-xl p-6"
+        className="relative lg:w-[60vw] md:w-[70vw] max-h-[80vh] overflow-y-auto bg-white rounded-2xl shadow-xl p-6"
       >
         <button
           onClick={() => setShowPopup(false)}

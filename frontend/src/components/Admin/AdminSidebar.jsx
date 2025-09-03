@@ -28,9 +28,12 @@ const AdminSidebar = ({ toggleSideBar }) => {
           AURORACART
         </a>
       </div>
-      <h1 className="md:px-9 px-8 font-medium tracking-tighter text-lg md:text-xl">
-        Admin Dashboard
-      </h1>
+      <a href="/admin">
+        {" "}
+        <h1 className="md:px-9 px-8 font-medium tracking-tighter text-lg md:text-xl">
+          Admin Dashboard
+        </h1>
+      </a>
 
       <div>
         {adminLinks.map((item, idx) => {

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import AdminHeader from "../../components/Admin/AdminHeader";
 import { useDispatch, useSelector } from "react-redux";
-import { GetAllUsers } from "../../redux/slices/AdminSlice";
+import { GetAllUsers, Revenue } from "../../redux/slices/AdminSlice";
 import { Link } from "react-router-dom";
 
 const AdminHomePage = () => {
@@ -9,6 +9,12 @@ const AdminHomePage = () => {
   const { products } = useSelector((state) => state.product);
   const { orders } = useSelector((state) => state.order);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(Revenue());
+  }, []);
+
+  const { revenue } = useSelector((state) => state.admin);
 
   useEffect(() => {
     dispatch(GetAllUsers());
@@ -21,7 +27,9 @@ const AdminHomePage = () => {
         <div className="rounded-md bg-white shadow-xl">
           <div className="p-4">
             <h1 className="font-semibold text-lg">Revenue</h1>
-            <div className="text-lg font-semibold">$1000</div>
+            <div className="text-lg font-semibold">
+              ${revenue && revenue.toFixed(2)}
+            </div>
           </div>
         </div>
 

@@ -108,45 +108,60 @@ export const GetFilteredProducts = async (req, res) => {
 
     if (category) {
       const categories = Array.isArray(category) ? category : [category];
-      andFilters.push({ category: { $in: categories } });
+      andFilters.push({
+        category: { $in: categories.map((c) => new RegExp(`^${c}$`, "i")) },
+      });
     }
 
     if (brand) {
       const brands = Array.isArray(brand) ? brand : [brand];
-      andFilters.push({ brand: { $in: brands } });
+      andFilters.push({
+        brand: { $in: brands.map((b) => new RegExp(`^${b}$`, "i")) },
+      });
     }
 
     if (sizes) {
       const sizeArr = Array.isArray(sizes) ? sizes : [sizes];
-      andFilters.push({ sizes: { $in: sizeArr } });
+      andFilters.push({
+        sizes: { $in: sizeArr.map((s) => new RegExp(`^${s}$`, "i")) },
+      });
     }
 
     if (colors) {
       const colorArr = Array.isArray(colors) ? colors : [colors];
-      andFilters.push({ colors: { $in: colorArr } });
+      andFilters.push({
+        colors: { $in: colorArr.map((c) => new RegExp(`^${c}$`, "i")) },
+      });
     }
 
     if (collections) {
       const colArr = Array.isArray(collections) ? collections : [collections];
-      andFilters.push({ collections: { $in: colArr } });
+      andFilters.push({
+        collections: { $in: colArr.map((c) => new RegExp(`^${c}$`, "i")) },
+      });
     }
 
     if (material) {
       const matArr = Array.isArray(material) ? material : [material];
-      andFilters.push({ material: { $in: matArr } });
+      andFilters.push({
+        material: { $in: matArr.map((m) => new RegExp(`^${m}$`, "i")) },
+      });
     }
 
     if (gender) {
-      andFilters.push({ gender });
+      andFilters.push({ gender: new RegExp(`^${gender}$`, "i") });
     }
 
     const priceFilter = {};
-    if (minPrice && !isNaN(minPrice)) {
+
+    if (minPrice !== undefined && minPrice !== "" && !isNaN(minPrice)) {
       priceFilter.price = { ...priceFilter.price, $gte: Number(minPrice) };
     }
-    if (maxPrice && !isNaN(maxPrice)) {
+
+    if (maxPrice !== undefined && maxPrice !== "" && !isNaN(maxPrice)) {
       priceFilter.price = { ...priceFilter.price, $lte: Number(maxPrice) };
     }
+
     if (Object.keys(priceFilter).length) {
       andFilters.push(priceFilter);
     }
@@ -156,7 +171,7 @@ export const GetFilteredProducts = async (req, res) => {
       query = { $and: andFilters };
     }
 
-    const products = await Product.find(query);
+    const products = await Product.find(query).sort({ price: 1 });
 
     res.status(200).json({
       success: true,

@@ -62,7 +62,6 @@ export const SearchedProducts = createAsyncThunk(
         },
       });
 
-      console.log(res.data.searchedProduct);
       if (res.data.success) {
         return {
           searchedProduct: res.data.searchedProduct,

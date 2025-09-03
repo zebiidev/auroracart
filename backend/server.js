@@ -27,7 +27,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  res.send("Backend running");
+  res.send("Auroracart Backend running");
+});
+
+app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
 });
 
 app.use("/api/user", userRouter);

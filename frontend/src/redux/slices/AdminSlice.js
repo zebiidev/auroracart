@@ -10,6 +10,7 @@ const initialState = {
   getloading: false,
   searchloading: false,
   filteredUser: [],
+  revenue: null,
 };
 export const AddUser = createAsyncThunk(
   "/adduser",
@@ -98,6 +99,26 @@ export const SearchedUser = createAsyncThunk(
     }
   }
 );
+export const Revenue = createAsyncThunk(
+  "/get-revenue",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      const res = await axios.get("/api/admin/get-revenue", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.data.success) {
+        return res.data.totalRevenue;
+      }
+    } catch (error) {
+      console.log(error);
+      rejectWithValue(error.data);
+    }
+  }
+);
 
 const AdminSlice = createSlice({
   name: "admin slice",
@@ -146,6 +167,13 @@ const AdminSlice = createSlice({
       })
       .addCase(SearchedUser.rejected, (state) => {
         state.searchloading = false;
+      })
+      .addCase(Revenue.pending, (state) => {})
+      .addCase(Revenue.fulfilled, (state, action) => {
+        state.revenue = action.payload;
+      })
+      .addCase(Revenue.rejected, (state) => {
+        state.revenue = null;
       });
   },
 });

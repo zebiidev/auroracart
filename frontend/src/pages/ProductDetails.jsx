@@ -124,7 +124,8 @@ const ProductDetails = () => {
             <h1 className="uppercase font-medium">{singleProduct?.name}</h1>
             <div className="flex gap-5">
               <p className="font-semibold">
-                <span>PKR</span> {singleProduct?.discountPrice}
+                <span>{import.meta.env.VITE_CURRENCY}</span>{" "}
+                {singleProduct?.discountPrice}
               </p>
             </div>
             <div>

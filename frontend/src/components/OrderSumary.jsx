@@ -42,7 +42,7 @@ const OrderSummary = ({ shipping }) => {
 
               {/* Price */}
               <div className="text-sm font-medium whitespace-nowrap">
-                <span className="pr-1">Rs</span>
+                <span className="pr-1">{import.meta.env.VITE_CURRENCY}</span>
                 {item.price}
               </div>
             </div>
@@ -57,7 +57,7 @@ const OrderSummary = ({ shipping }) => {
         <div className="flex items-center justify-between">
           <div className="font-medium text-md">Subtotal</div>
           <div>
-            Rs
+            {import.meta.env.VITE_CURRENCY}
             {userCart?.products?.reduce(
               (acc, item) => acc + item.price * item.quantity,
               0
@@ -68,7 +68,7 @@ const OrderSummary = ({ shipping }) => {
         {shipping === "flat" && (
           <div className="flex items-center justify-between">
             <div className="font-medium text-md">Shipping</div>
-            <div>Rs250</div>
+            <div>{import.meta.env.VITE_CURRENCY}250</div>
           </div>
         )}
       </div>
@@ -77,7 +77,7 @@ const OrderSummary = ({ shipping }) => {
       <div className="w-full flex mt-8 items-center justify-between">
         <div className="font-bold text-2xl">Total</div>
         <div className="text-lg font-semibold">
-          Rs
+          {import.meta.env.VITE_CURRENCY}
           {(
             userCart?.products?.reduce(
               (acc, item) => acc + item.price * item.quantity,

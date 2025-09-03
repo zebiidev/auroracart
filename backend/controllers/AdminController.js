@@ -3,6 +3,7 @@ import imageKit from "../config/imageKit.js";
 import fs from "fs";
 import User from "../models/UserModel.js";
 import bcrypt from "bcrypt";
+import Order from "../models/OrderModel.js";
 
 export const AddProduct = async (req, res) => {
   try {
@@ -22,8 +23,6 @@ export const AddProduct = async (req, res) => {
       gender,
       numReviews,
     } = req.body;
-
-    console.log(req.body);
 
     const files = req.files;
 
@@ -304,6 +303,34 @@ export const SearchUser = async (req, res) => {
     res
       .status(200)
       .json({ message: "Searched User", success: true, filteredUser });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false });
+  }
+};
+
+export const Revenue = async (req, res) => {
+  try {
+    let paidOrders = await Order.find({ paymentStatus: "paid" });
+
+    const totalRevenue = paidOrders.reduce(
+      (acc, item) => acc + item.totalPrice,
+      0
+    );
+
+    if (!totalRevenue) {
+      return res
+        .status(400)
+        .json({ message: "Unable to calculate revenue", success: false });
+    }
+
+    res.status(200).json({
+      message: "Total revenue of yuor store",
+      success: true,
+      totalRevenue,
+    });
   } catch (error) {
     console.error(error);
     return res

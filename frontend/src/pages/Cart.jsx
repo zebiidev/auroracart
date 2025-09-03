@@ -92,7 +92,9 @@ const Cart = () => {
                 <h2 className="text-sm md:text-base font-medium">
                   {item.name}
                 </h2>
-                <p className="text-sm text-gray-600">PKR {item.price}</p>
+                <p className="text-sm text-gray-600">
+                  {import.meta.env.VITE_CURRENCY} {item.price}
+                </p>
                 <p className="text-xs text-gray-500 mt-1">
                   Color: {item.color}
                 </p>
@@ -155,7 +157,8 @@ const Cart = () => {
             </div>
 
             <div className="text-right text-sm md:text-base">
-              PKR {(item.price * item.quantity).toFixed(2)}
+              {import.meta.env.VITE_CURRENCY}{" "}
+              {(item.price * item.quantity).toFixed(2)}
             </div>
 
             <div className="col-span-3 flex justify-between items-center md:hidden mt-2">
@@ -218,6 +221,7 @@ const Cart = () => {
       <div className="flex flex-col items-end mt-6 gap-2">
         <div className="text-lg font-semibold flex items-center gap-2">
           <span>Subtotal:</span>
+
           {cartLoading ? (
             <FadeLoader
               color="#111"
@@ -227,8 +231,8 @@ const Cart = () => {
               className="ml-2"
             />
           ) : (
-            // <span className="ml-2">PKR {userCart?.totalPrice?.toFixed(2)}</span>
             <span className="ml-2">
+              {import.meta.env.VITE_CURRENCY}
               {userCart?.products
                 ?.reduce((acc, item) => acc + item.price * item.quantity, 0)
                 .toFixed(2)}

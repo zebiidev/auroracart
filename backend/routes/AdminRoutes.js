@@ -8,6 +8,7 @@ import {
   DeleteUser,
   EditProduct,
   FetchAllUser,
+  Revenue,
   SearchUser,
 } from "../controllers/AdminController.js";
 import upload from "../middlewares/upload.js";
@@ -34,5 +35,6 @@ adminRouter.post("/add-user", IsloggedIn, IsAdmin, AddNewUser);
 adminRouter.delete("/del-user/:id", IsloggedIn, IsAdmin, DeleteUser);
 adminRouter.get("/get-all-users", IsloggedIn, IsAdmin, FetchAllUser);
 adminRouter.get("/searched-user", IsloggedIn, IsAdmin, SearchUser);
+adminRouter.get("/get-revenue", IsloggedIn, IsAdmin, Revenue);
 
 export default adminRouter;

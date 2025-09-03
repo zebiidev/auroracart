@@ -11,18 +11,22 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
   const category = [...new Set(products.map((p) => p.category))];
   const brand = [...new Set(products.map((p) => p.brand))];
   const material = [...new Set(products.map((p) => p.material))];
-  const collections = [...new Set(products.map((p) => p.collections))];
+  const collections = [
+    ...new Set(
+      products.flatMap((p) =>
+        Array.isArray(p.collections) ? p.collections : [p.collections]
+      )
+    ),
+  ];
   const gender = [...new Set(products.map((p) => p.gender))];
-  const colors = [...new Set(products.flatMap((p) => p.colors))];
 
   const [searchParams, setSearchParams] = useSearchParams();
   const params = Object.fromEntries(searchParams.entries());
-  const { register, watch, setValue } = useForm({
+  const { register, watch, setValue, reset } = useForm({
     defaultValues: {
       category: params.category?.split(",") || [],
       gender: params.gender || "",
       brand: params.brand?.split(",") || [],
-      colors: params.colors?.split(",") || [],
       collections: params.collections?.split(",") || [],
       material: params.material?.split(",") || [],
       minPrice: params.minPrice ? parseFloat(params.minPrice) : "",
@@ -35,7 +39,6 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
 
   useEffect(() => {
     const query = new URLSearchParams();
-
     Object.entries(values).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         const filtered = value.filter(Boolean);
@@ -53,23 +56,18 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
         }
       }
     });
-
     setSearchParams(query);
   }, [values, setSearchParams]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
       const paramsObj = Object.fromEntries(searchParams.entries());
-
       const filters = {
         category: paramsObj.category
           ? paramsObj.category.split(",").filter(Boolean)
           : [],
         brand: paramsObj.brand
           ? paramsObj.brand.split(",").filter(Boolean)
-          : [],
-        colors: paramsObj.colors
-          ? paramsObj.colors.split(",").filter(Boolean)
           : [],
         collections: paramsObj.collections
           ? paramsObj.collections.split(",").filter(Boolean)
@@ -90,24 +88,15 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
             ? Number(paramsObj.maxPrice)
             : null,
       };
-
       const cleanFilters = Object.fromEntries(
         Object.entries(filters).filter(([_, v]) =>
           Array.isArray(v) ? v.length > 0 : v !== null && v !== ""
         )
       );
-
       dispatch(GetFilteredProducts(cleanFilters));
     }, 300);
-
     return () => clearTimeout(handler);
   }, [searchParams, dispatch]);
-
-  const getValidColor = (color) => {
-    const s = new Option().style;
-    s.color = color;
-    return s.color ? color : "#ccc";
-  };
 
   return (
     <form className="relative overflow-y-auto p-3 space-y-5">
@@ -119,7 +108,6 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
         <IoClose />
       </div>
 
-      {/* Category */}
       <div>
         <h1 className="text-lg font-medium mb-2">Category</h1>
         {category.map((c, index) => (
@@ -130,18 +118,20 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
         ))}
       </div>
 
-      {/* Gender */}
       <div>
         <h1 className="text-lg font-medium mb-2">Gender</h1>
         {gender.map((g, index) => (
           <label key={`${g}-${index}`} className="flex items-center gap-2">
-            <input type="radio" value={g} {...register("gender")} />
+            <input
+              type="radio"
+              value={g.charAt(0).toUpperCase() + g.slice(1).toLowerCase()}
+              {...register("gender")}
+            />
             <span>{g}</span>
           </label>
         ))}
       </div>
 
-      {/* Brand */}
       <div>
         <h1 className="text-lg font-medium mb-2">Brand</h1>
         {brand.map((b, index) => (
@@ -152,28 +142,6 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
         ))}
       </div>
 
-      {/* Colors */}
-      <div>
-        <h1 className="text-lg font-medium mb-2">Colors</h1>
-        <div className="flex flex-wrap gap-2">
-          {colors.map((c, index) => (
-            <label key={`${c}-${index}`} title={c} className="cursor-pointer">
-              <input
-                type="checkbox"
-                value={c}
-                {...register("colors")}
-                className="hidden"
-              />
-              <div
-                className="w-6 h-6 rounded-full border"
-                style={{ backgroundColor: getValidColor(c) }}
-              />
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* Collections */}
       <div>
         <h1 className="text-lg font-medium mb-2">Collections</h1>
         {collections.map((col, index) => (
@@ -184,7 +152,6 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
         ))}
       </div>
 
-      {/* Materials */}
       <div>
         <h1 className="text-lg font-medium mb-2">Materials</h1>
         {material.map((m, index) => (
@@ -195,7 +162,6 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
         ))}
       </div>
 
-      {/* Price Range */}
       <div>
         <h1 className="text-lg font-medium mb-2">Price (Max)</h1>
         <input
@@ -203,13 +169,23 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
           min="0"
           max="500"
           step="1"
-          value={values.maxPrice || 0}
+          value={values.maxPrice ?? 500}
           onChange={(e) => setValue("maxPrice", parseFloat(e.target.value))}
           className="w-full"
         />
         <div className="flex justify-between text-sm text-gray-600 mt-2">
-          <span>${values.maxPrice || "∞"}</span>
+          <span>{values.maxPrice ? `$${values.maxPrice}` : "∞"}</span>
         </div>
+      </div>
+
+      <div className="pt-4">
+        <button
+          type="button"
+          onClick={() => reset()}
+          className="px-3 py-1 bg-gray-200 rounded-md text-sm"
+        >
+          Clear Filters
+        </button>
       </div>
     </form>
   );

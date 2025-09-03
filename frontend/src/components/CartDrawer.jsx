@@ -94,7 +94,8 @@ const CartDrawer = ({ toggleCartDrawer }) => {
               <div className="flex justify-between">
                 <div className="text-gray-500 text-md">{item.quantity}X</div>
                 <div className="text-sm font-normal">
-                  PKR <span>{(item.price * item.quantity).toFixed(2)}</span>
+                  {import.meta.env.VITE_CURRENCY}
+                  <span>{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -111,7 +112,8 @@ const CartDrawer = ({ toggleCartDrawer }) => {
       <div className="flex items-center justify-end">
         <span className="text-sm"> TOTAL:</span>
         <div className="text-sm pl-1 font-normal">
-          PKR <span>{userCart?.totalPrice.toFixed(2) || 0}</span>
+          {import.meta.env.VITE_CURRENCY}{" "}
+          <span>{userCart?.totalPrice.toFixed(2) || 0}</span>
         </div>
       </div>
 

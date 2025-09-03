@@ -112,7 +112,7 @@ const Navbar = () => {
               <button
                 disabled={loader}
                 className={`md:text-xs  md:block hidden text-lg ${
-                  loader ? "bg-gray-100 cursor-not-allowed px-2 py-2" : ""
+                  loader ? " cursor-not-allowed px-2 py-2" : ""
                 }`}
               >
                 <span> Logging Out...</span>
