@@ -11,6 +11,8 @@ const initialState = {
   orderDetails: null,
   updateLoading: false,
   detailLoading: false,
+  myOrders: null,
+  myLoading: false,
 };
 
 export const GetAllOrders = createAsyncThunk(
@@ -119,6 +121,30 @@ export const UpdateOrderStatus = createAsyncThunk(
   }
 );
 
+export const MyOrderss = createAsyncThunk(
+  "/myorders",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+
+      if (!token) {
+        return rejectWithValue("Token not available");
+      }
+      const res = await axios.get("/api/order/get-my-orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.data.success) {
+        return res.data.myOrders;
+      }
+    } catch (error) {
+      return rejectWithValue(error.data);
+    }
+  }
+);
+
 const orderSlice = createSlice({
   name: "order",
   initialState,
@@ -169,6 +195,16 @@ const orderSlice = createSlice({
       })
       .addCase(UpdateOrderStatus.rejected, (state) => {
         state.updateLoading = false;
+      })
+      .addCase(MyOrderss.pending, (state) => {
+        state.myLoading = true;
+      })
+      .addCase(MyOrderss.fulfilled, (state, action) => {
+        state.myLoading = false;
+        state.myOrders = action.payload;
+      })
+      .addCase(MyOrderss.rejected, (state) => {
+        state.myLoading = false;
       });
   },
 });

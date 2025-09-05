@@ -22,7 +22,6 @@ const Checkout = () => {
   let products = userCart?.products;
 
   const cities = [
-    "Select city from dropdown",
     "Karachi",
     "Lahore",
     "Islamabad",
@@ -109,7 +108,7 @@ const Checkout = () => {
               lastName: data.lastName,
               phoneNo: data.phoneNo,
               shippingAddress: data.shippingAddress,
-              shippingMethod: shipping,
+              shippingMethod: data.shipping,
             }),
           }
         );

@@ -60,6 +60,7 @@ export const CreateCheckout = async (req, res) => {
       shippingAddress,
       paymentMethod,
       totalPrice,
+      shippingMethod,
       paymentStatus: "pending",
       status: "Processing",
     });

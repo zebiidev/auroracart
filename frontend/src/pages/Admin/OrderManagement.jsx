@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AdminHeader from "../../components/Admin/AdminHeader";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,12 +6,18 @@ import FadeLoader from "react-spinners/FadeLoader";
 import { Eye } from "lucide-react";
 import {
   DeleteOrder,
+  GetAllOrders,
   GetOrderDetails,
   UpdateOrderStatus,
 } from "../../redux/slices/OrderSlice";
 import OrderDetailPopUp from "../../components/Admin/OrderDetailPopUp";
 
 const OrderManagement = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(GetAllOrders());
+  }, []);
+
   const [showPopup, setShowPopup] = useState(false);
   const [updating, setUpdating] = useState([]);
   const [delid, setDelId] = useState([]);
@@ -24,8 +30,6 @@ const OrderManagement = () => {
     updateLoading,
     delLoading,
   } = useSelector((state) => state.order);
-
-  const dispatch = useDispatch();
 
   const handleStatusChange = (id, updatedStatus) => {
     setUpdating((prev) => [...prev, id]);

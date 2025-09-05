@@ -2,7 +2,8 @@ import Order from "../models/OrderModel.js";
 
 export const myOrders = async (req, res) => {
   try {
-    const myOrders = await Order.findById({ user: req.user._id }).sort({
+    const id = req.user._id;
+    const myOrders = await Order.find({ user: id }).sort({
       createdAt: -1,
     });
 

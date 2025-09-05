@@ -1,10 +1,9 @@
-import logo from "./logo.png";
-import banner_img from "./banner_img.jpg";
+import logo from "./logo_converted.avif";
 
-import mobile_hero from "./mobile_hero.webp";
-import hero from "./hero.webp";
-import man_collection from "./man_collection.jpg";
-import women_collection from "./women_collection.jpg";
+import mobile_hero from "./mobile_hero_converted.avif";
+import hero from "./hero_converted.avif";
+import man_collection from "./man_collection_converted.avif";
+import women_collection from "./women_collection_converted.avif";
 import mastercard from "./mastercard.svg";
 import visa from "./visa.svg";
 
@@ -12,7 +11,6 @@ export const assets = {
   mastercard,
   visa,
   logo,
-  banner_img,
   hero,
   mobile_hero,
   man_collection,
