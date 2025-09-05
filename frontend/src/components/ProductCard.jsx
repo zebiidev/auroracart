@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { GetSingleProduct } from "../redux/slices/ProductSlice";
 
 const ProductCard = ({ CardData, toggleSearchBar }) => {
   const navigate = useNavigate();
@@ -22,6 +20,7 @@ const ProductCard = ({ CardData, toggleSearchBar }) => {
             src={CardData.images[0].url}
             alt={CardData.name}
             loading="lazy"
+            decoding="async"
           />
         </div>
         <div className="mt-2 font-normal text-sm sm:text-base">

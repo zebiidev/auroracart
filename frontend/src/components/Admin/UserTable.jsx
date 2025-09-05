@@ -14,7 +14,7 @@ const UserTable = () => {
     (state) => state.admin
   );
 
-  const { filteredUser, searchloading } = useSelector((state) => state.admin);
+  const { filteredUser } = useSelector((state) => state.admin);
 
   const dispalyUser = filteredUser.length > 0 ? filteredUser : allusers;
 

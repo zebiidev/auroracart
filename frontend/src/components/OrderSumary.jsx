@@ -58,10 +58,9 @@ const OrderSummary = ({ shipping }) => {
           <div className="font-medium text-md">Subtotal</div>
           <div>
             {import.meta.env.VITE_CURRENCY}
-            {userCart?.products?.reduce(
-              (acc, item) => acc + item.price * item.quantity,
-              0
-            )}
+            {userCart?.products
+              ?.reduce((acc, item) => acc + item.price * item.quantity, 0)
+              .toFixed(2)}
           </div>
         </div>
 
