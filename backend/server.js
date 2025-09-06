@@ -11,6 +11,9 @@ import orderRouter from "./routes/OrderRoutes.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { StripeWebhook } from "./controllers/CheckoutController.js";
+import helmet from "helmet";
+import compression from "compression";
+
 const app = express();
 
 dotenv.config();
@@ -21,9 +24,11 @@ app.post(
   StripeWebhook
 );
 
+app.use(helmet());
+app.use(compression());
 app.use(cors());
 app.set("query parser", (str) => qs.parse(str));
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
