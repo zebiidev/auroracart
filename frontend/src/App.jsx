@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { AuthInfo } from "./redux/slices/AuthSlice";
 import { GetUserCart } from "./redux/slices/CartSlice";
 import "react-toastify/dist/ReactToastify.css";
+import FadeLoader from "react-spinners/FadeLoader";
 
 // ✅ Lazy-loaded pages
 const Home = lazy(() => import("./pages/Home"));
@@ -37,7 +38,6 @@ const App = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // ✅ Only fetch auth + cart at startup (lightweight)
     dispatch(AuthInfo()).then(() => {
       dispatch(GetUserCart());
     });
@@ -67,7 +67,11 @@ const App = () => {
       >
         {/* ✅ Suspense wrapper for lazy-loaded routes */}
         <Suspense
-          fallback={<div className="text-center py-10">Loading...</div>}
+          fallback={
+            <div className="flex items-center justify-center py-10">
+              <FadeLoader />
+            </div>
+          }
         >
           <Routes>
             <Route path="/" element={<Home />} />

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Title from "../components/Title";
 import { CiFilter } from "react-icons/ci";
 import ProductCard from "../components/ProductCard";
@@ -19,7 +19,9 @@ const Collection = () => {
     dispatch(GetAllProducts());
   }, [dispatch]);
 
-  const toggleFilterDrawer = () => setOpenFilters(!openFilter);
+  const toggleFilterDrawer = useCallback(() => {
+    setOpenFilters((prev) => !prev);
+  }, [openFilter]);
 
   const handleClickOutside = (e) => {
     if (filterRef.current && !filterRef.current.contains(e.target)) {

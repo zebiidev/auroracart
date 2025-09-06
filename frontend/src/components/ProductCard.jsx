@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({ CardData, toggleSearchBar }) => {
@@ -35,4 +35,4 @@ const ProductCard = ({ CardData, toggleSearchBar }) => {
   );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);

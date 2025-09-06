@@ -69,8 +69,9 @@ export const AuthInfo = createAsyncThunk(
       const token = JSON.parse(localStorage.getItem("token"));
 
       if (!token) {
-        return rejectWithValue("No token till now ");
+        return rejectWithValue("No token found. Please login.");
       }
+
       const res = await axios.get("/api/user/auth-info", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -81,7 +82,17 @@ export const AuthInfo = createAsyncThunk(
         return res.data.userInfo;
       }
     } catch (error) {
-      return rejectWithValue(error.message);
+      if (error.response?.status === 401) {
+        toast.error(
+          error.response.data.message || "Session expired. Please login again."
+        );
+        localStorage.removeItem("token");
+        return rejectWithValue("Unauthorized");
+      }
+
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Something went wrong"
+      );
     }
   }
 );

@@ -14,8 +14,6 @@ const MyOrders = () => {
 
   const isShipping = myOrders?.map((item) => item.shippingMethod);
 
-  console.log(isShipping);
-
   if (myLoading)
     return (
       <div className="flex items-center justify-center mt-16 text-center">

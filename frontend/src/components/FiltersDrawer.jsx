@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { IoClose } from "react-icons/io5";
 import { useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -7,18 +7,32 @@ import { GetFilteredProducts } from "../redux/slices/ProductSlice";
 
 const FiltersDrawer = ({ toggleFilterDrawer }) => {
   const { products } = useSelector((state) => state.product);
-
-  const category = [...new Set(products.map((p) => p.category))];
-  const brand = [...new Set(products.map((p) => p.brand))];
-  const material = [...new Set(products.map((p) => p.material))];
-  const collections = [
-    ...new Set(
-      products.flatMap((p) =>
-        Array.isArray(p.collections) ? p.collections : [p.collections]
-      )
-    ),
-  ];
-  const gender = [...new Set(products.map((p) => p.gender))];
+  const category = useMemo(
+    () => [...new Set(products.map((p) => p.category))],
+    [products]
+  );
+  const brand = useMemo(
+    () => [...new Set(products.map((p) => p.brand))],
+    [products]
+  );
+  const material = useMemo(
+    () => [...new Set(products.map((p) => p.material))],
+    [products]
+  );
+  const collections = useMemo(
+    () => [
+      ...new Set(
+        products.flatMap((p) =>
+          Array.isArray(p.collections) ? p.collections : [p.collections]
+        )
+      ),
+    ],
+    [products]
+  );
+  const gender = useMemo(
+    () => [...new Set(products.map((p) => p.gender))],
+    [products]
+  );
 
   const [searchParams, setSearchParams] = useSearchParams();
   const params = Object.fromEntries(searchParams.entries());
@@ -191,4 +205,4 @@ const FiltersDrawer = ({ toggleFilterDrawer }) => {
   );
 };
 
-export default FiltersDrawer;
+export default React.memo(FiltersDrawer);
