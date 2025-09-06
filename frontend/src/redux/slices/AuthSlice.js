@@ -83,9 +83,6 @@ export const AuthInfo = createAsyncThunk(
       }
     } catch (error) {
       if (error.response?.status === 401) {
-        toast.error(
-          error.response.data.message || "Session expired. Please login again."
-        );
         localStorage.removeItem("token");
         return rejectWithValue("Unauthorized");
       }

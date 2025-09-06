@@ -2,8 +2,18 @@ import React, { useEffect } from "react";
 import AdminHeader from "../../components/Admin/AdminHeader";
 import ProductTable from "../../components/Admin/ProductTable";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { GetAllProducts } from "../../redux/slices/ProductSlice";
 const ProductManagement = () => {
+  const { products } = useSelector((state) => state.product);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!products || products.length === 0) {
+      dispatch(GetAllProducts());
+    }
+  }, [dispatch, products]);
 
   return (
     <div>

@@ -12,7 +12,7 @@ import { GetUserCart } from "./redux/slices/CartSlice";
 import "react-toastify/dist/ReactToastify.css";
 import FadeLoader from "react-spinners/FadeLoader";
 
-// ✅ Lazy-loaded pages
+//  Lazy-loaded pages
 const Home = lazy(() => import("./pages/Home"));
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const Collection = lazy(() => import("./pages/Collection"));

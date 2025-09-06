@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import Title from "../components/Title";
 import { CiFilter } from "react-icons/ci";
 import ProductCard from "../components/ProductCard";
@@ -16,12 +22,13 @@ const Collection = () => {
   const { products, filtered, loading } = useSelector((state) => state.product);
 
   useEffect(() => {
-    dispatch(GetAllProducts());
-  }, [dispatch]);
-
+    if (!loading && (!products || products.length === 0)) {
+      dispatch(GetAllProducts());
+    }
+  }, [dispatch, products, loading]);
   const toggleFilterDrawer = useCallback(() => {
     setOpenFilters((prev) => !prev);
-  }, [openFilter]);
+  }, []);
 
   const handleClickOutside = (e) => {
     if (filterRef.current && !filterRef.current.contains(e.target)) {
@@ -34,14 +41,16 @@ const Collection = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  let displayProducts =
-    filtered && filtered.length !== 0 ? [...filtered] : [...(products || [])];
-
-  if (price === "low-to-high") {
-    displayProducts = [...displayProducts].sort((a, b) => a.price - b.price);
-  } else if (price === "high-to-low") {
-    displayProducts = [...displayProducts].sort((a, b) => b.price - a.price);
-  }
+  const displayProducts = useMemo(() => {
+    let list = filtered?.length ? [...filtered] : [...(products || [])];
+    if (price === "low-to-high") {
+      return list.sort((a, b) => a.price - b.price);
+    }
+    if (price === "high-to-low") {
+      return list.sort((a, b) => b.price - a.price);
+    }
+    return list;
+  }, [filtered, products, price]);
 
   return (
     <div className="w-full overflow-x-hidden relative">
@@ -72,7 +81,6 @@ const Collection = () => {
         </div>
       </div>
 
-      {/* Filters Drawer + Product Grid */}
       <div className="flex mt-5">
         <div
           ref={filterRef}

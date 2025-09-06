@@ -70,7 +70,9 @@ const UserTable = () => {
               <tr>
                 <td colSpan={4}>
                   {" "}
-                  <FadeLoader className="w-full text-center" />
+                  <div className="flex items-center justify-center mt-7">
+                    <FadeLoader className="w-full text-center" />
+                  </div>
                 </td>
               </tr>
             ) : dispalyUser.length > 0 ? (

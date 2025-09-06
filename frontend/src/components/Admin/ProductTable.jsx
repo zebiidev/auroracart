@@ -42,8 +42,10 @@ const ProductTable = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={4}>
-                  <FadeLoader />
+                <td colSpan={5}>
+                  <div className="flex justify-center items-center h-32">
+                    <FadeLoader />
+                  </div>
                 </td>
               </tr>
             ) : products.length > 0 ? (
