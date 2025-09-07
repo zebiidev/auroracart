@@ -8,6 +8,7 @@ import {
   DeleteUser,
   EditProduct,
   FetchAllUser,
+  GetAllAdminProduct,
   Revenue,
   SearchUser,
 } from "../controllers/AdminController.js";
@@ -36,5 +37,6 @@ adminRouter.delete("/del-user/:id", IsloggedIn, IsAdmin, DeleteUser);
 adminRouter.get("/get-all-users", IsloggedIn, IsAdmin, FetchAllUser);
 adminRouter.get("/searched-user", IsloggedIn, IsAdmin, SearchUser);
 adminRouter.get("/get-revenue", IsloggedIn, IsAdmin, Revenue);
+adminRouter.get("/get-all-prd-admin", IsloggedIn, IsAdmin, GetAllAdminProduct);
 
 export default adminRouter;

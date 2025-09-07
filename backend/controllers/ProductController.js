@@ -2,18 +2,34 @@ import Product from "../models/ProductModel.js";
 
 export const GetAllProducts = async (req, res) => {
   try {
-    const allProducts = await Product.find().sort({ createdAt: -1 });
+    // Get page & limit from query (default: page=1, limit=10)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
-    if (!allProducts) {
+    // Calculate how many to skip
+    const skip = (page - 1) * limit;
+
+    const products = await Product.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Count total products (for frontend to know when to stop loading)
+    const total = await Product.countDocuments();
+
+    if (!products) {
       return res
         .status(400)
         .json({ message: "Unable to fetch products", success: false });
     }
 
     res.status(200).json({
-      message: "All products fetched successfully",
+      message: "Products fetched successfully",
       success: true,
-      allProducts,
+      products, // send only paginated products
+      total, // send total count for infinite scroll
+      page,
+      pages: Math.ceil(total / limit), // total number of pages
     });
   } catch (error) {
     console.log(error);

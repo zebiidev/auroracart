@@ -338,3 +338,23 @@ export const Revenue = async (req, res) => {
       .json({ message: "Internal server error", success: false });
   }
 };
+
+export const GetAllAdminProduct = async (req, res) => {
+  try {
+    const adminPrd = await Product.find().sort({ createdAt: -1 });
+
+    if (!adminPrd) {
+      return res.status(400).json({
+        message: "Unable to fetch all products admin",
+        success: false,
+      });
+    }
+
+    res.status(200).json({ message: "All products", success: true, adminPrd });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false });
+  }
+};
