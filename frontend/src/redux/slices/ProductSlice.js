@@ -127,6 +127,8 @@ export const AddProductadmin = createAsyncThunk(
       }
     } catch (error) {
       console.log(error);
+      const msg = error.response?.data.message;
+      toast.error(msg);
       return rejectWithValue(error.data);
     }
   }
@@ -148,6 +150,8 @@ export const DelProductadmin = createAsyncThunk(
       }
     } catch (error) {
       console.log(error);
+      const msg = error.response?.data.message;
+      toast.error(msg);
       return rejectWithValue(error.data);
     }
   }
@@ -171,6 +175,8 @@ export const EditProductadmin = createAsyncThunk(
       }
     } catch (error) {
       console.log(error);
+      const msg = error.response?.data.message;
+      toast.error(msg);
       return rejectWithValue(error.data);
     }
   }
@@ -186,9 +192,9 @@ const productSlice = createSlice({
       })
       .addCase(GetAllProducts.fulfilled, (state, action) => {
         if (action.payload.page === 1) {
-          state.products = action.payload.products; // first load
+          state.products = action.payload.products;
         } else {
-          state.products = [...state.products, ...action.payload.products]; // append
+          state.products = [...state.products, ...action.payload.products];
         }
         state.page = action.payload.page;
         state.pages = action.payload.pages;
@@ -247,7 +253,9 @@ const productSlice = createSlice({
       })
       .addCase(AddProductadmin.fulfilled, (state, action) => {
         state.addloading = false;
-        state.products.push(action.payload);
+        if (action.payload) {
+          state.products.push(action.payload);
+        }
       })
       .addCase(AddProductadmin.rejected, (state, action) => {
         state.addloading = false;
@@ -258,9 +266,11 @@ const productSlice = createSlice({
       })
       .addCase(DelProductadmin.fulfilled, (state, action) => {
         state.delLoading = false;
-        state.products = state.products.filter(
-          (item) => item._id !== action.payload
-        );
+        if (action.payload) {
+          state.products = state.products.filter(
+            (item) => item._id !== action.payload
+          );
+        }
       })
       .addCase(DelProductadmin.rejected, (state, action) => {
         state.delLoading = false;
@@ -271,11 +281,13 @@ const productSlice = createSlice({
       })
       .addCase(EditProductadmin.fulfilled, (state, action) => {
         state.editLoading = false;
-        state.products = state.products.map((item) =>
-          item._id === action.payload.id
-            ? { ...item, ...action.payload.product }
-            : item
-        );
+        if (action.payload.id && action.payload.product) {
+          state.products = state.products.map((item) =>
+            item._id === action.payload.id
+              ? { ...item, ...action.payload.product }
+              : item
+          );
+        }
       })
       .addCase(EditProductadmin.rejected, (state, action) => {
         state.editLoading = false;

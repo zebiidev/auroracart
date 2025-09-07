@@ -6,19 +6,25 @@ import {
   SearchedUser,
 } from "../../redux/slices/AdminSlice";
 import FadeLoader from "react-spinners/FadeLoader";
+
 const UserTable = () => {
   const dispatch = useDispatch();
   const [delid, setdelid] = useState(null);
   const [inputVal, setInputVal] = useState("");
-  const { allusers, getloading, delloading } = useSelector(
+  const { allusers, getloading, delloading, filteredUser } = useSelector(
     (state) => state.admin
   );
 
-  const { filteredUser } = useSelector((state) => state.admin);
-
-  const dispalyUser = filteredUser.length > 0 ? filteredUser : allusers;
+  // show filtered if available, otherwise allusers
+  const dispalyUser =
+    Array.isArray(filteredUser) && filteredUser.length > 0
+      ? filteredUser
+      : Array.isArray(allusers)
+      ? allusers
+      : [];
 
   const handleDelete = (id) => {
+    if (!id) return; // safeguard
     setdelid(id);
     dispatch(DeleteUser(id));
   };
@@ -44,8 +50,8 @@ const UserTable = () => {
 
   return (
     <div className="max-w-7xl">
-      <div className="w-full flex  items-center md:flex-row flex-col justify-between">
-        <h2 className="text-2xl  font-bold mb-6"> User Management</h2>
+      <div className="w-full flex items-center md:flex-row flex-col justify-between">
+        <h2 className="text-2xl font-bold mb-6"> User Management</h2>
         <input
           value={inputVal}
           onChange={handleInputChange}
@@ -69,46 +75,48 @@ const UserTable = () => {
             {getloading ? (
               <tr>
                 <td colSpan={4}>
-                  {" "}
                   <div className="flex items-center justify-center mt-7">
                     <FadeLoader className="w-full text-center" />
                   </div>
                 </td>
               </tr>
             ) : dispalyUser.length > 0 ? (
-              dispalyUser.map((user) => (
-                <tr
-                  key={user._id}
-                  className="border-b hover:bg-gray-50 transition-colors"
-                >
-                  <td className="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">
-                    {user.firstName}
-                  </td>
-                  <td
-                    className="py-4 px-4 font-medium text-gray-900 max-w-[200px] truncate"
-                    title={user.email}
+              dispalyUser
+                .filter(Boolean) // remove undefined/null users
+                .map((user) => (
+                  <tr
+                    key={user?._id || Math.random()}
+                    className="border-b hover:bg-gray-50 transition-colors"
                   >
-                    {user.email}
-                  </td>
-                  <td className="py-4 px-4 whitespace-nowrap">{user.role}</td>
-                  <td className="p-4">
-                    <button
-                      onClick={() => handleDelete(user._id)}
-                      className={`bg-red-500 text-white  px-3 py-2 rounded text-sm ${
-                        delid === user._id && delloading
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "hover:bg-red-600"
-                      }`}
+                    <td className="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">
+                      {user?.firstName || user?.name || "N/A"}
+                    </td>
+                    <td
+                      className="py-4 px-4 font-medium text-gray-900 max-w-[200px] truncate"
+                      title={user?.email || "N/A"}
                     >
-                      {delid === user._id && delloading ? (
-                        <p>Deleting....</p>
-                      ) : (
-                        "Delete"
-                      )}
-                    </button>
-                  </td>
-                </tr>
-              ))
+                      {user?.email || "N/A"}
+                    </td>
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      {user?.role || "N/A"}
+                    </td>
+                    <td className="p-4">
+                      <button
+                        onClick={() => handleDelete(user?._id)}
+                        disabled={delid === user?._id && delloading}
+                        className={`px-3 py-2 rounded text-sm text-white ${
+                          delid === user?._id && delloading
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-red-500 hover:bg-red-600"
+                        }`}
+                      >
+                        {delid === user?._id && delloading
+                          ? "Deleting..."
+                          : "Delete"}
+                      </button>
+                    </td>
+                  </tr>
+                ))
             ) : (
               <tr>
                 <td colSpan={4} className="py-4 px-4 text-center text-gray-500">

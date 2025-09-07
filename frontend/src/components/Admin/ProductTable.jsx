@@ -13,7 +13,6 @@ const ProductTable = () => {
 
   const { adminPrd, adminLoading } = useSelector((state) => state.admin);
 
-  console.log(adminPrd);
   const handleDelProduct = (id) => {
     setDel(id);
     dispatch(DelProductadmin(id));
@@ -46,7 +45,7 @@ const ProductTable = () => {
                 </td>
               </tr>
             ) : adminPrd.length > 0 ? (
-              adminPrda.map((products) => (
+              adminPrd.map((products) => (
                 <tr
                   key={products.id}
                   className="border-b hover:bg-gray-50 transition-colors"

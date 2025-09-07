@@ -25,16 +25,25 @@ export const AddUser = createAsyncThunk(
         },
       });
 
-      if (res.data.success) {
-        toast.success(res.data.message);
-        return res.data.newUser;
+      if (!res.data.success) {
+        toast.error(res.data.message || "Failed to add user");
+        return rejectWithValue(res.data.message);
       }
+
+      toast.success(res.data.message);
+      return res.data.newUser;
     } catch (error) {
-      console.log(error);
-      rejectWithValue(error.data);
+      console.error("AddUser error:", error);
+
+      const errMsg =
+        error.response?.data?.message || "Something went wrong on AddUser";
+
+      toast.error(errMsg);
+      return rejectWithValue(errMsg);
     }
   }
 );
+
 export const GetAllUsers = createAsyncThunk(
   "/getuser",
   async (_, { rejectWithValue }) => {
@@ -51,7 +60,7 @@ export const GetAllUsers = createAsyncThunk(
       }
     } catch (error) {
       console.log(error);
-      rejectWithValue(error.data);
+      return rejectWithValue(error.data);
     }
   }
 );
@@ -72,7 +81,9 @@ export const DeleteUser = createAsyncThunk(
       }
     } catch (error) {
       console.log(error);
-      rejectWithValue(error.data);
+      const msg = error?.response?.data?.message;
+      toast.error(msg);
+      return rejectWithValue(error.data);
     }
   }
 );
@@ -152,7 +163,9 @@ const AdminSlice = createSlice({
         state.loading = true;
       })
       .addCase(AddUser.fulfilled, (state, action) => {
-        state.allusers.push(action.payload);
+        if (action.payload && action.payload._id) {
+          state.allusers.push(action.payload);
+        }
         state.loading = false;
       })
       .addCase(AddUser.rejected, (state) => {
@@ -162,9 +175,10 @@ const AdminSlice = createSlice({
         state.getloading = true;
       })
       .addCase(GetAllUsers.fulfilled, (state, action) => {
-        state.allusers = action.payload;
+        state.allusers = Array.isArray(action.payload) ? action.payload : [];
         state.getloading = false;
       })
+
       .addCase(GetAllUsers.rejected, (state) => {
         state.getloading = false;
       })
@@ -172,12 +186,14 @@ const AdminSlice = createSlice({
         state.delloading = true;
       })
       .addCase(DeleteUser.fulfilled, (state, action) => {
-        state.allusers = state.allusers.filter(
-          (item) => item._id !== action.payload
-        );
-
+        if (action.payload) {
+          state.allusers = state.allusers.filter(
+            (item) => item._id !== action.payload
+          );
+        }
         state.delloading = false;
       })
+
       .addCase(DeleteUser.rejected, (state) => {
         state.searchloading = false;
       })
