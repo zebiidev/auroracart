@@ -11,6 +11,8 @@ const initialState = {
   searchloading: false,
   filteredUser: [],
   revenue: null,
+  adminPrd: [],
+  adminLoading: false,
 };
 export const AddUser = createAsyncThunk(
   "/adduser",
@@ -99,6 +101,27 @@ export const SearchedUser = createAsyncThunk(
     }
   }
 );
+
+export const AllProductsAdmin = createAsyncThunk(
+  "/allproducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      const res = await axios.get("/api/admin/get-all-prd-admin", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.data.success) {
+        return res.data.adminPrd;
+      }
+    } catch (error) {
+      console.log(error);
+      rejectWithValue(error.data);
+    }
+  }
+);
 export const Revenue = createAsyncThunk(
   "/get-revenue",
   async (_, { rejectWithValue }) => {
@@ -174,6 +197,18 @@ const AdminSlice = createSlice({
       })
       .addCase(Revenue.rejected, (state) => {
         state.revenue = null;
+      })
+
+      .addCase(AllProductsAdmin.pending, (state) => {
+        state.adminLoading = true;
+      })
+      .addCase(AllProductsAdmin.fulfilled, (state, action) => {
+        state.adminLoading = false;
+        state.adminPrd = action.payload;
+      })
+      .addCase(AllProductsAdmin.rejected, (state) => {
+        state.adminPrd = [];
+        state.adminLoading = false;
       });
   },
 });

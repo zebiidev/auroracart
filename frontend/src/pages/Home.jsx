@@ -14,7 +14,7 @@ const Home = () => {
 
   useEffect(() => {
     if (!products || products.length === 0) {
-      dispatch(GetAllProducts());
+      dispatch(GetAllProducts({ page: 1, limit: 8 }));
     }
   }, [dispatch, products]);
 

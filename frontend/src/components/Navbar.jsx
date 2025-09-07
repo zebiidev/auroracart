@@ -5,7 +5,7 @@ import CartDrawer from "./CartDrawer";
 import SearchbarDrawer from "./SearchbarDrawer";
 import Hero from "./Hero";
 import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { IoIosMenu } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
 import NavbarDrawer from "./NavbarDrawer";
@@ -87,9 +87,9 @@ const Navbar = () => {
         }`}
       >
         <div>
-          <a href="/" className="logo md:text-3xl   text-xl">
-            AURORACART
-          </a>
+          <Link to="/">
+            <div className="logo md:text-3xl   text-xl">AURORACART</div>
+          </Link>
         </div>
         <div className="flex items-center justify-between gap-4">
           <div
@@ -133,12 +133,15 @@ const Navbar = () => {
               LOG IN
             </button>
           )}
-          <button
-            onClick={() => navigate("/collection")}
-            className="text-lg md:block hidden md:text-sm"
-          >
-            All Collections
-          </button>
+          <Link to="/collection">
+            {" "}
+            <button
+              // onClick={() => navigate("/collection")}
+              className="text-lg md:block hidden md:text-sm"
+            >
+              All Collections
+            </button>
+          </Link>
           <button
             onClick={() => navigate("/cart")}
             className="md:text-sm md:block hidden text-lg"

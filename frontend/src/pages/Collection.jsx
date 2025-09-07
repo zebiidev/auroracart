@@ -12,6 +12,7 @@ import FiltersDrawer from "../components/FiltersDrawer";
 import { useDispatch, useSelector } from "react-redux";
 import { GetAllProducts } from "../redux/slices/ProductSlice";
 import FadeLoader from "react-spinners/FadeLoader";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const Collection = () => {
   const [openFilter, setOpenFilters] = useState(false);
@@ -19,13 +20,16 @@ const Collection = () => {
   const filterRef = useRef();
 
   const dispatch = useDispatch();
-  const { products, filtered, loading } = useSelector((state) => state.product);
+  const { products, filtered, loading, page, pages, total } = useSelector(
+    (state) => state.product
+  );
 
   useEffect(() => {
     if (!loading && (!products || products.length === 0)) {
-      dispatch(GetAllProducts());
+      dispatch(GetAllProducts({ page: 1, limit: 10 }));
     }
   }, [dispatch, products, loading]);
+
   const toggleFilterDrawer = useCallback(() => {
     setOpenFilters((prev) => !prev);
   }, []);
@@ -41,16 +45,24 @@ const Collection = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Sorting
   const displayProducts = useMemo(() => {
     let list = filtered?.length ? [...filtered] : [...(products || [])];
     if (price === "low-to-high") {
-      return list.sort((a, b) => a.price - b.price);
+      return [...list].sort((a, b) => a.price - b.price);
     }
     if (price === "high-to-low") {
-      return list.sort((a, b) => b.price - a.price);
+      return [...list].sort((a, b) => b.price - a.price);
     }
     return list;
   }, [filtered, products, price]);
+
+  // Load more function for infinite scroll
+  const fetchMoreProducts = () => {
+    if (page < pages) {
+      dispatch(GetAllProducts({ page: page + 1, limit: 10 }));
+    }
+  };
 
   return (
     <div className="w-full overflow-x-hidden relative">
@@ -82,6 +94,7 @@ const Collection = () => {
       </div>
 
       <div className="flex mt-5">
+        {/* Filters Drawer */}
         <div
           ref={filterRef}
           className={`
@@ -98,21 +111,40 @@ const Collection = () => {
         >
           <FiltersDrawer toggleFilterDrawer={toggleFilterDrawer} />
         </div>
-        <div
-          className={`
-    grid flex-1 gap-4 px-5
-    grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3
-    items-start
-  `}
-        >
-          {loading ? (
+
+        <div className="flex-1 px-5">
+          {loading && products.length === 0 ? (
             <div className="flex justify-center items-center w-full pt-16">
               <FadeLoader />
             </div>
           ) : displayProducts.length > 0 ? (
-            displayProducts.map((CardData) => (
-              <ProductCard key={CardData._id} CardData={CardData} />
-            ))
+            <InfiniteScroll
+              dataLength={products.length}
+              next={fetchMoreProducts}
+              hasMore={page < pages}
+              loader={
+                <div className="flex justify-center items-center py-5">
+                  <FadeLoader />
+                </div>
+              }
+              endMessage={
+                <p className="text-center py-5 text-gray-500">
+                  🎉 You’ve reached the end!
+                </p>
+              }
+            >
+              <div
+                className={`
+                  grid gap-4
+                  grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3
+                  items-start
+                `}
+              >
+                {displayProducts.map((CardData) => (
+                  <ProductCard key={CardData._id} CardData={CardData} />
+                ))}
+              </div>
+            </InfiniteScroll>
           ) : (
             <p className="text-center w-full pt-16">No products found.</p>
           )}

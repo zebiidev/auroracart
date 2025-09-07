@@ -1,11 +1,15 @@
 import React, { useEffect } from "react";
 import AdminHeader from "../../components/Admin/AdminHeader";
 import { useDispatch, useSelector } from "react-redux";
-import { GetAllUsers, Revenue } from "../../redux/slices/AdminSlice";
+import {
+  AllProductsAdmin,
+  GetAllUsers,
+  Revenue,
+} from "../../redux/slices/AdminSlice";
 import { Link } from "react-router-dom";
 
 const AdminHomePage = () => {
-  const { allusers } = useSelector((state) => state.admin);
+  const { allusers, adminPrd } = useSelector((state) => state.admin);
   const { products } = useSelector((state) => state.product);
   const { orders } = useSelector((state) => state.order);
   const dispatch = useDispatch();
@@ -17,7 +21,7 @@ const AdminHomePage = () => {
   const { revenue } = useSelector((state) => state.admin);
 
   useEffect(() => {
-    dispatch(GetAllUsers());
+    dispatch(GetAllUsers()).then(() => dispatch(AllProductsAdmin()));
   }, [dispatch]);
 
   return (
@@ -52,7 +56,7 @@ const AdminHomePage = () => {
           <div className="p-4">
             <h1 className="font-semibold text-lg">Total Products</h1>
             <div className="text-lg font-semibold">
-              {products.length && products.length}
+              {adminPrd.length && adminPrd.length}
             </div>
             <Link
               to="products"

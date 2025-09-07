@@ -9,24 +9,21 @@ import { DelProductadmin } from "../../redux/slices/ProductSlice";
 const ProductTable = () => {
   const dispatch = useDispatch();
   const [del, setDel] = useState(null);
-  const { products, loading, delLoading } = useSelector(
-    (state) => state.product
-  );
+  const { delLoading } = useSelector((state) => state.product);
 
+  const { adminPrd, adminLoading } = useSelector((state) => state.admin);
+
+  console.log(adminPrd);
   const handleDelProduct = (id) => {
     setDel(id);
     dispatch(DelProductadmin(id));
-  };
-
-  const handleEdit = (id) => {
-    console.log(id);
   };
 
   const navigate = useNavigate();
   return (
     <div className="w-full">
       <h1 className="text-sm py-2 text-gray-500">
-        TotalProucts <span>{products.length}</span>
+        TotalProucts <span>{adminPrd && adminPrd.length}</span>
       </h1>
       <div className="overflow-x-auto shadow-md sm:rounded-lg">
         <table className="min-w-full text-left text-sm text-gray-500">
@@ -40,7 +37,7 @@ const ProductTable = () => {
             </tr>
           </thead>
           <tbody>
-            {loading ? (
+            {adminLoading ? (
               <tr>
                 <td colSpan={5}>
                   <div className="flex justify-center items-center h-32">
@@ -48,8 +45,8 @@ const ProductTable = () => {
                   </div>
                 </td>
               </tr>
-            ) : products.length > 0 ? (
-              products.map((products) => (
+            ) : adminPrd.length > 0 ? (
+              adminPrda.map((products) => (
                 <tr
                   key={products.id}
                   className="border-b hover:bg-gray-50 transition-colors"

@@ -15,16 +15,27 @@ const initialState = {
   delLoading: false,
   editLoading: false,
   singleLoading: false,
+  total: null,
+  page: null,
+  pages: null,
 };
-
 export const GetAllProducts = createAsyncThunk(
-  "/getallproducts",
-  async (_, { rejectWithValue }) => {
+  "products/getAll",
+  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const res = await axios.get("/api/product/all-products");
+      const res = await axios.get(
+        `/api/product/all-products?page=${page}&limit=${limit}`
+      );
 
       if (res.data.success) {
-        return res.data.allProducts;
+        return {
+          products: res.data.products, // paginated products
+          total: res.data.total, // total count
+          page: res.data.page, // current page
+          pages: res.data.pages, // total pages
+        };
+      } else {
+        return rejectWithValue("Failed to fetch products");
       }
     } catch (error) {
       console.log(error.message);
@@ -174,8 +185,15 @@ const productSlice = createSlice({
         state.loading = true;
       })
       .addCase(GetAllProducts.fulfilled, (state, action) => {
+        if (action.payload.page === 1) {
+          state.products = action.payload.products; // first load
+        } else {
+          state.products = [...state.products, ...action.payload.products]; // append
+        }
+        state.page = action.payload.page;
+        state.pages = action.payload.pages;
+        state.total = action.payload.total;
         state.loading = false;
-        state.products = action.payload;
       })
       .addCase(GetAllProducts.rejected, (state) => {
         state.loading = false;
@@ -239,7 +257,7 @@ const productSlice = createSlice({
         state.delLoading = true;
       })
       .addCase(DelProductadmin.fulfilled, (state, action) => {
-        state.delLoading = true;
+        state.delLoading = false;
         state.products = state.products.filter(
           (item) => item._id !== action.payload
         );
