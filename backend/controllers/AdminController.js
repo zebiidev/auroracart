@@ -310,32 +310,77 @@ export const SearchUser = async (req, res) => {
       .json({ message: "Internal server error", success: false });
   }
 };
-
 export const Revenue = async (req, res) => {
   try {
-    let paidOrders = await Order.find({ paymentStatus: "paid" });
+    const now = new Date();
 
-    const totalRevenue = paidOrders.reduce(
-      (acc, item) => acc + item.totalPrice,
-      0
-    );
+    // 🔹 Calculate date ranges
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-    if (!totalRevenue) {
-      return res
-        .status(400)
-        .json({ message: "Unable to calculate revenue", success: false });
-    }
+    const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(now.setHours(23, 59, 59, 999));
 
-    res.status(200).json({
-      message: "Total revenue of yuor store",
+    // 🔹 Monthly Revenue
+    const revenueMonthly = await Order.aggregate([
+      {
+        $match: {
+          paymentStatus: "paid",
+          createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalPrice" },
+        },
+      },
+    ]);
+
+    const revenueToday = await Order.aggregate([
+      {
+        $match: {
+          paymentStatus: "paid",
+          createdAt: { $gte: startOfDay, $lte: endOfDay },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalPrice" },
+        },
+      },
+    ]);
+
+    // 🔹 All-Time Revenue
+    const total = await Order.aggregate([
+      { $match: { paymentStatus: "paid" } },
+      {
+        $group: {
+          _id: null,
+          allTimeRevenue: { $sum: "$totalPrice" },
+        },
+      },
+    ]);
+
+    // 🔹 Extract values (default to 0 if empty)
+    const monthlyRevenue = revenueMonthly[0]?.total || 0;
+    const todayRevenue = revenueToday[0]?.total || 0;
+    const allTimeRevenue = total[0]?.allTimeRevenue || 0;
+
+    return res.status(200).json({
+      message: "Stats",
+      revenueMonthly: monthlyRevenue, // same name, cleaned value
+      revenueToday: todayRevenue, // new field
+      total: allTimeRevenue, // same name, cleaned value
       success: true,
-      totalRevenue,
     });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", success: false });
+    return res.status(500).json({
+      message: "Internal server error",
+      success: false,
+    });
   }
 };
 
@@ -356,5 +401,197 @@ export const GetAllAdminProduct = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Internal server error", success: false });
+  }
+};
+
+export const GetUserThisMonth = async (req, res) => {
+  try {
+    const monthlyUser = await User.aggregate([
+      {
+        $match: {
+          $expr: {
+            $and: [
+              { $eq: [{ $month: "$createdAt" }, { $month: "$$NOW" }] },
+              { $eq: [{ $year: "$createdAt" }, { $year: "$$NOW" }] },
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
+    if (!monthlyUser || monthlyUser.length === 0) {
+      return res.status(400).json({
+        message: "No users found",
+        success: false,
+        monthlyUser,
+      });
+    }
+
+    res.status(200).json({
+      message: "Users registered monthly",
+      success: true,
+      monthlyUser,
+    });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false });
+  }
+};
+
+export const StockAlert = async (req, res) => {
+  try {
+    const stockCount = await Product.aggregate([
+      { $match: { countStock: { $lt: 7 } } },
+      { $group: { _id: null, total: { $sum: 1 } } },
+    ]);
+
+    const total = stockCount[0]?.total || 0;
+
+    res.status(200).json({
+      message: "Low stock count",
+      success: true,
+      total,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      success: false,
+    });
+  }
+};
+
+export const TrendingProduct = async (req, res) => {
+  try {
+    let trendingProducts = await Order.aggregate([
+      { $unwind: "$orderItems" },
+      {
+        $group: {
+          _id: "$orderItems.productId",
+          name: { $first: "$orderItems.name" },
+          image: { $first: "$orderItems.image" },
+          totalOrdered: { $sum: "$orderItems.quantity" },
+        },
+      },
+      { $sort: { totalOrdered: -1 } },
+      { $limit: 5 },
+    ]);
+
+    if (!trendingProducts || trendingProducts.length === 0) {
+      return res.status(400).json({
+        message: "Internal server error",
+        success: false,
+      });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Trending products", success: true, trendingProducts });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      success: false,
+    });
+  }
+};
+
+export const MonthlySales = async (req, res) => {
+  try {
+    const sales = await Order.aggregate([
+      {
+        $match: { paymentStatus: "paid" },
+      },
+      {
+        $group: {
+          _id: {
+            month: { $month: "$createdAt" },
+            year: { $year: "$createdAt" },
+          },
+          total: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]);
+
+    const formatted = sales.map((s) => ({
+      month: `${s._id.month}-${s._id.year}`,
+      total: s.total,
+    }));
+
+    res.status(200).json({ success: true, sales: formatted });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const OrderStatus = async (req, res) => {
+  try {
+    const orderstatuses = await Order.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    if (!orderstatuses || orderstatuses.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Unable to count orders" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Your orders", success: true, orderstatuses });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const TotalOrdersThisMonth = async (req, res) => {
+  try {
+    // Get the first day of the current month
+    const startOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    );
+    // Get the first day of the next month
+    const startOfNextMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth() + 1,
+      1
+    );
+
+    // Count orders between start and end of current month
+    const totalOrders = await Order.countDocuments({
+      createdAt: { $gte: startOfMonth, $lt: startOfNextMonth },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Total orders for the current month",
+      totalOrders,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };

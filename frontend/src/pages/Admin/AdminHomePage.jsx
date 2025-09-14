@@ -4,72 +4,67 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   AllProductsAdmin,
   GetAllUsers,
+  GetMonthlySales,
+  GetOrdersByStatus,
+  GetTrendingProducts,
+  LowStock,
+  MonthlyUser,
   Revenue,
+  TotalOrdersThisMonth,
 } from "../../redux/slices/AdminSlice";
 import { Link } from "react-router-dom";
+import MonthlySalesChart from "../../components/Admin/MonthlySalesChart";
+import OrdersStatusChart from "../../components/Admin/OrdersStatusChart";
+import TrendingProduct from "../../components/Admin/TrendingProduct";
+import MonthlySummary from "../../components/Admin/MonthlySummary";
 
 const AdminHomePage = () => {
-  const { allusers, adminPrd } = useSelector((state) => state.admin);
-  const { products } = useSelector((state) => state.product);
-  const { orders } = useSelector((state) => state.order);
+  const { allusers } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(Revenue());
-  }, []);
-
-  const { revenue } = useSelector((state) => state.admin);
-
-  useEffect(() => {
+    dispatch(LowStock());
+    dispatch(GetOrdersByStatus());
+    dispatch(GetTrendingProducts());
     dispatch(GetAllUsers()).then(() => dispatch(AllProductsAdmin()));
+    dispatch(GetMonthlySales());
+    dispatch(TotalOrdersThisMonth());
+    dispatch(MonthlyUser());
   }, [dispatch]);
+  const data = useSelector((state) => state.admin.salesChart);
+
+  const orderData = useSelector((state) => state.admin.orderChart);
+
+  const {
+    revenue,
+    allTime,
+    today,
+    trending,
+    monthly,
+    orderThisMonth,
+    stockTotal,
+    userMonthly,
+  } = useSelector((state) => state.admin);
 
   return (
     <div>
       <AdminHeader title="Store Stats" />
-      <div className="grid mx-11 grid-cols-1 lg:grid-cols-3 gap-7 md:grid-cols-2">
+      <div className="grid md:mx-11 grid-cols-1 lg:grid-cols-3 gap-7 md:grid-cols-2">
         <div className="rounded-md bg-white shadow-xl">
           <div className="p-4">
-            <h1 className="font-semibold text-lg">Revenue</h1>
+            <h1 className="font-semibold text-gray-500 text-md">
+              Today's Revenue
+            </h1>
             <div className="text-lg font-semibold">
-              ${revenue && revenue.toFixed(2)}
+              ${revenue ? today : "0"}
             </div>
           </div>
         </div>
 
         <div className="rounded-md bg-white shadow-xl">
           <div className="p-4">
-            <h1 className="font-semibold text-lg">Total Orders</h1>
-            <div className="text-lg font-semibold">
-              {orders ? orders.length : 0}
-            </div>
-            <Link
-              to="orders"
-              className="inline-block py-2 font-medium text-blue-600 hover:underline"
-            >
-              Manage Orders
-            </Link>
-          </div>
-        </div>
-
-        <div className="rounded-md bg-white shadow-xl">
-          <div className="p-4">
-            <h1 className="font-semibold text-lg">Total Products</h1>
-            <div className="text-lg font-semibold">
-              {adminPrd.length && adminPrd.length}
-            </div>
-            <Link
-              to="products"
-              className="inline-block py-2 font-medium text-blue-600 hover:underline"
-            >
-              Manage Products
-            </Link>
-          </div>
-        </div>
-
-        <div className="rounded-md bg-white shadow-xl">
-          <div className="p-4">
-            <h1 className="font-semibold text-lg">Total Users</h1>
+            <h1 className="font-semibold text-gray-500 text-md">Total Users</h1>
             <div className="text-lg font-semibold">
               {allusers.length && allusers.length}
             </div>
@@ -80,6 +75,35 @@ const AdminHomePage = () => {
               Manage Users
             </Link>
           </div>
+        </div>
+
+        <div className="rounded-md bg-white shadow-xl">
+          <div className="p-4">
+            <h1 className="font-semibold text-gray-500 text-md">
+              All Time Revenue
+            </h1>
+            <div className="text-lg font-semibold">
+              ${allTime ? allTime : "0.00"}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="md:mx-11 grid grid-cols-1 gap-4 my-11 md:grid-cols-2">
+        <MonthlySalesChart data={data} />
+        <OrdersStatusChart data={orderData} />
+      </div>
+      <div className="grid md:mx-11 grid-cols-1 gap-7 md:grid-cols-2">
+        <div>
+          <TrendingProduct trending={trending} />
+        </div>
+        <div>
+          <MonthlySummary
+            monthly={monthly}
+            monthlyOrder={orderThisMonth}
+            trending={trending}
+            stock={stockTotal}
+            userMonthly={userMonthly}
+          />
         </div>
       </div>
     </div>

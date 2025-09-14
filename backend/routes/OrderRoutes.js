@@ -2,6 +2,7 @@ import express from "express";
 import {
   AllOrders,
   DeleteOrder,
+  GetOrderThisMonth,
   myOrders,
   OrderDetails,
   UpdateOrderStatus,
@@ -15,5 +16,6 @@ orderRouter.get("/all-orders", IsloggedIn, IsAdmin, AllOrders);
 orderRouter.get("/order-Details/:id", IsloggedIn, IsAdmin, OrderDetails);
 orderRouter.delete("/del-order/:id", IsloggedIn, IsAdmin, DeleteOrder);
 orderRouter.put("/update-order-status", IsloggedIn, IsAdmin, UpdateOrderStatus);
+orderRouter.get("/get-order-thisMonth", IsloggedIn, IsAdmin, GetOrderThisMonth);
 
 export default orderRouter;

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
+
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const initialState = {
@@ -13,6 +14,15 @@ const initialState = {
   revenue: null,
   adminPrd: [],
   adminLoading: false,
+  allTime: null,
+  today: null,
+  salesChart: [],
+  orderChart: [],
+  trending: [],
+  monthly: null,
+  orderThisMonth: null,
+  stockTotal: null,
+  userMonthly: [],
 };
 export const AddUser = createAsyncThunk(
   "/adduser",
@@ -145,11 +155,122 @@ export const Revenue = createAsyncThunk(
       });
 
       if (res.data.success) {
-        return res.data.totalRevenue;
+        return {
+          today: res.data.revenueToday,
+          monthly: res.data.revenueMonthly,
+          allTime: res.data.total,
+        };
       }
     } catch (error) {
       console.log(error);
       rejectWithValue(error.data);
+    }
+  }
+);
+
+export const GetMonthlySales = createAsyncThunk(
+  "admin/monthly-sales",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      const res = await axios.get("/api/admin/monthly-sales", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.data.success) {
+        return res.data.sales;
+      }
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const GetTrendingProducts = createAsyncThunk(
+  "admin/trending-products",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      const res = await axios.get("/api/admin/trending-products", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.data.success) {
+        return res.data.trendingProducts;
+      }
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const GetOrdersByStatus = createAsyncThunk(
+  "admin/orders-status",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      const res = await axios.get("/api/admin/orders-chart", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.data.success) {
+        return res.data.orderstatuses;
+      }
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const TotalOrdersThisMonth = createAsyncThunk(
+  "admin/orders-thisMonth",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      const res = await axios.get("/api/admin/orders-thisMonth", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.data.success) {
+        return res.data.totalOrders;
+      }
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const MonthlyUser = createAsyncThunk(
+  "admin/users-monthly",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      const res = await axios.get("/api/admin/get-monthlyUser", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.data.success) {
+        return res.data.monthlyUser;
+      }
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const LowStock = createAsyncThunk(
+  "admin/low-stock",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      const res = await axios.get("/api/admin/low-stock", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.data.success) {
+        return res.data.total;
+      }
+    } catch (error) {
+      return rejectWithValue(error.response.data);
     }
   }
 );
@@ -209,7 +330,10 @@ const AdminSlice = createSlice({
       })
       .addCase(Revenue.pending, (state) => {})
       .addCase(Revenue.fulfilled, (state, action) => {
-        state.revenue = action.payload;
+        state.revenue = action.payload.monthly;
+        state.allTime = action.payload.allTime;
+        state.today = action.payload.today;
+        state.monthly = action.payload.monthly;
       })
       .addCase(Revenue.rejected, (state) => {
         state.revenue = null;
@@ -225,6 +349,42 @@ const AdminSlice = createSlice({
       .addCase(AllProductsAdmin.rejected, (state) => {
         state.adminPrd = [];
         state.adminLoading = false;
+      })
+      .addCase(GetMonthlySales.fulfilled, (state, action) => {
+        state.salesChart = action.payload;
+      })
+      .addCase(GetMonthlySales.rejected, (state) => {
+        state.salesChart = [];
+      })
+      .addCase(GetOrdersByStatus.fulfilled, (state, action) => {
+        state.orderChart = action.payload;
+      })
+      .addCase(GetOrdersByStatus.rejected, (state, action) => {
+        state.orderChart = [];
+      })
+      .addCase(GetTrendingProducts.fulfilled, (state, action) => {
+        state.trending = action.payload;
+      })
+      .addCase(GetTrendingProducts.rejected, (state) => {
+        state.trending = [];
+      })
+      .addCase(TotalOrdersThisMonth.fulfilled, (state, action) => {
+        state.orderThisMonth = action.payload;
+      })
+      .addCase(TotalOrdersThisMonth.rejected, (state) => {
+        state.orderThisMonth = null;
+      })
+      .addCase(LowStock.fulfilled, (state, action) => {
+        state.stockTotal = action.payload;
+      })
+      .addCase(LowStock.rejected, (state) => {
+        state.stockTotal = null;
+      })
+      .addCase(MonthlyUser.fulfilled, (state, action) => {
+        state.userMonthly = action.payload;
+      })
+      .addCase(MonthlyUser.rejected, (state) => {
+        state.userMonthly = [];
       });
   },
 });

@@ -37,7 +37,7 @@ const SearchbarDrawer = ({ toggleSearchBar }) => {
 
   const productsToShow = searching
     ? productsSearched || []
-    : products?.slice(8, 12) || [];
+    : products?.slice(0, 5) || [];
 
   return (
     <div className="bg-white h-[100vh] p-6 z-50 overflow-y-auto max-w-full">

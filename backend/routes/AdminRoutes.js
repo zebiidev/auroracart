@@ -9,8 +9,14 @@ import {
   EditProduct,
   FetchAllUser,
   GetAllAdminProduct,
+  GetUserThisMonth,
+  MonthlySales,
+  OrderStatus,
   Revenue,
   SearchUser,
+  StockAlert,
+  TotalOrdersThisMonth,
+  TrendingProduct,
 } from "../controllers/AdminController.js";
 import upload from "../middlewares/upload.js";
 const adminRouter = express.Router();
@@ -38,5 +44,11 @@ adminRouter.get("/get-all-users", IsloggedIn, IsAdmin, FetchAllUser);
 adminRouter.get("/searched-user", IsloggedIn, IsAdmin, SearchUser);
 adminRouter.get("/get-revenue", IsloggedIn, IsAdmin, Revenue);
 adminRouter.get("/get-all-prd-admin", IsloggedIn, IsAdmin, GetAllAdminProduct);
+adminRouter.get("/get-monthlyUser", IsloggedIn, IsAdmin, GetUserThisMonth);
+adminRouter.get("/low-stock", IsloggedIn, IsAdmin, StockAlert);
+adminRouter.get("/trending-products", IsloggedIn, IsAdmin, TrendingProduct);
+adminRouter.get("/monthly-sales", IsloggedIn, IsAdmin, MonthlySales);
+adminRouter.get("/orders-chart", IsloggedIn, IsAdmin, OrderStatus);
+adminRouter.get("/orders-thisMonth", IsloggedIn, IsAdmin, TotalOrdersThisMonth);
 
 export default adminRouter;

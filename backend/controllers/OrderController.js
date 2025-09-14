@@ -122,3 +122,41 @@ export const UpdateOrderStatus = async (req, res) => {
       .json({ message: "Internal server error", success: false });
   }
 };
+
+export const GetOrderThisMonth = async (req, res) => {
+  try {
+    const totalOrders = await Order.aggregate([
+      {
+        $match: {
+          $expr: {
+            $and: [
+              { $eq: [{ $month: "$createdAt" }, { $month: "$$NOW" }] },
+              { $eq: [{ $year: "$createdAt" }, { $year: "$$NOW" }] },
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
+    if (!totalOrders || totalOrders.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Unabe to get orders", success: false });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Your orders", success: true, totalOrders });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false });
+  }
+};

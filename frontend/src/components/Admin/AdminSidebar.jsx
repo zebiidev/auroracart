@@ -2,7 +2,7 @@ import React from "react";
 import { FaUserAlt, FaBoxOpen } from "react-icons/fa";
 import { TbBorderAll } from "react-icons/tb";
 import { CiShop } from "react-icons/ci";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { MdLogout } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/slices/AuthSlice";
@@ -24,16 +24,16 @@ const AdminSidebar = ({ toggleSideBar }) => {
   return (
     <div className="w-full z-50">
       <div className="p-6">
-        <a href="/" className="logo text-xl ">
+        <Link to="/" className="logo text-xl ">
           AURORACART
-        </a>
+        </Link>
       </div>
-      <a href="/admin">
+      <Link to="/admin">
         {" "}
         <h1 className="md:px-9 px-8 font-medium tracking-tighter text-lg md:text-xl">
           Admin Dashboard
         </h1>
-      </a>
+      </Link>
 
       <div>
         {adminLinks.map((item, idx) => {

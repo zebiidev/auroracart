@@ -133,7 +133,7 @@ const OrderDetailPopUp = ({ setShowPopup, detailLoading, orderDetails }) => {
             <div className="flex justify-between border-b pb-2">
               <span className="font-medium text-gray-600">User email</span>
               <span className="text-gray-800">
-                PKR {orderDetails?.user?.email || "—"}
+                {orderDetails?.user?.email || "—"}
               </span>
             </div>
           </div>
